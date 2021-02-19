@@ -2,11 +2,12 @@ org 0x7c00          ; set initial addres
 jmp start			; go to start session
 bits 16
 titulo db 'Pratica 1',0
-humberto db 'HUMBERTO COSTA', 0
-gabriel db 'GABRIEL EVANGELISTA', 0
-malu db 'MARIA LUISA', 0
-bernardo db 'RAFAEL BERNARDO', 0
-
+humberto db 'hcct', 0
+gabriel db 'gme', 0
+gabriel2 db 'gfr', 0
+malu db 'mlll', 0
+bernardo db 'rbnn', 0
+msg db 'PRESS ENTER', 0
 
 
 start:
@@ -22,10 +23,16 @@ start:
 
 	call menuAndIntegrantes
 
+    .leitura:
+        call lerLetra
+        cmp al, 13
+        je limpaTela
+        jmp .leitura
 	ret
 
-limpaTela:
+
 ;; Limpa a tela dos caracteres colocados pela BIOS
+limpaTela:
 	; Set the cursor to top left-most corner of screen
 	mov dx, 0 
     mov bh, 0      
@@ -44,8 +51,21 @@ limpaTela:
     mov bh, 0      
     mov ah, 0x2
     int 0x10
-ret
+    ret
 
+
+;; Lê uma letra e armazena em al
+lerLetra:
+    mov ah, 0
+    int 16h
+    ret
+
+;; Printa uma letra
+printarLetra: 
+    mov ah, 0xe
+    mov bh, 0
+    int 10h
+    ret
 
 ;; Printa a string que esta em si    
 printString: 
@@ -78,7 +98,7 @@ animacaoColorida:
 	mov dl, 24h
 	int 10h
     mov dx, 500
-	call delay
+	;call delay
 
 	;Colorindo a tela de vermelho.
 	mov ah, 0xb  
@@ -93,7 +113,7 @@ animacaoColorida:
 	int 10h
 
     mov dx, 500
-    call delay
+    ;call delay
 	;Colorindo a tela de preto.
 	mov ah, 0xb  
 	mov bh, 0     
@@ -108,7 +128,7 @@ animacaoColorida:
         inc dx
         inc cx
     mov dx, 500
-	call delay
+	;call delay
 
 	;Colorindo a tela de vermelho (fim).
 	mov ah, 0xb  
@@ -123,8 +143,7 @@ animacaoColorida:
 	int 10h
 
     mov dx, 500
-
-ret
+    ret
 
 
 delay: 
@@ -137,7 +156,7 @@ delay:
 	dec dx
 	cmp dx,0    
 	jnz back
-ret
+    ret
 
 menuAndIntegrantes:
     
@@ -145,10 +164,8 @@ menuAndIntegrantes:
     mov ds, ax
     mov es, ax
 
-    
-
     ; mudar cor do curso
-    mov bl, 4
+    mov bl, 3
     call limpaTela
     
     mov ah, 0
@@ -159,69 +176,57 @@ menuAndIntegrantes:
     push ax
     call printaQuadrado
 
-	call moveCursor0
+    mov dh, 6  ; Linhas  
+    mov dl, 13  ; Colunas
+	call moveCursor
 	mov si, titulo
 	call printString
 
-    call moveCursor1
+    mov dh, 14  ; Linhas  
+    mov dl, 10  ; Colunas
+    call moveCursor
     mov si, malu
     call printString
     
-    call moveCursor2
+    mov dh, 15  ; Linhas  
+    mov dl, 10  ; Colunas
+    call moveCursor
     mov si, humberto
     call printString
 
-    call moveCursor3
+    mov dh, 16  ; Linhas  
+    mov dl, 10  ; Colunas
+    call moveCursor
     mov si, bernardo
     call printString
 
-    call moveCursor4
+    mov dh, 17  ; Linhas  
+    mov dl, 10  ; Colunas
+    call moveCursor
     mov si, gabriel
     call printString
 
- 
-
-ret  
-
-moveCursor0:	; printa titulo
-    mov bh, 0 
-    mov dh, 6  ; Linhas  
-    mov dl, 13  ; Colunas
-    mov ah, 0x2
-    int 0x10
-ret
-
-moveCursor1:    ; printa primeiro integrante
-    mov bh, 0 
-    mov dh, 14  ; Linhas  
+    mov dh, 18  ; Linhas  
     mov dl, 10  ; Colunas
-    mov ah, 0x2
-    int 0x10
-ret
+    call moveCursor
+    mov si, gabriel2
+    call printString
 
-moveCursor2:    ; printa segundo integrante
-    mov bh, 0 	
-    mov dh, 15  ; Linhas  
-    mov dl, 10  ; Colunas
-    mov ah, 0x2
-    int 0x10
-ret
+    mov dh, 19  ; Linhas  
+    mov dl, 14  ; Colunas
+    call moveCursor
+    mov si, msg
+    call printString
 
-moveCursor3:    ; printa terceiro integrante
+    pop ax
+    ret  
+
+moveCursor:	; printa titulo
     mov bh, 0 
-    mov dh, 16  ; Linhas  
-    mov dl, 10  ; Colunas
     mov ah, 0x2
     int 0x10
-ret
+    ret
 
-moveCursor4:	; printa quarto integrante
-    mov bh, 0 
-    mov dh, 17  ; Linhas  
-    mov dl, 10  ; Colunas
-    mov ah, 0x2
-    int 0x10
-ret
 
  printaQuadrado:
     
@@ -245,7 +250,7 @@ ret
         push dx
         push cx
         mov dx, 6
-        call delay
+        ;call delay
         pop cx
         pop dx
         call printaPixel
@@ -262,7 +267,7 @@ ret
          push dx
         push cx
         mov dx, 6
-        call delay
+        ;call delay
         pop cx
         pop dx
         call printaPixel
@@ -279,7 +284,7 @@ ret
          push dx
         push cx
         mov dx, 6
-        call delay
+        ;call delay
         pop cx
         pop dx
         call printaPixel
@@ -297,7 +302,7 @@ ret
          push dx
         push cx
         mov dx, 6
-        call delay
+        ;call delay
         pop cx
         pop dx
         call printaPixel
