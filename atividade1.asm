@@ -8,7 +8,8 @@ gabriel2 db 'gfr', 0
 malu db 'mlll', 0
 bernardo db 'rbnn', 0
 msg db 'PRESS ENTER', 0
-
+cadastro db 'Cadastrar conta', 0
+busca db 'Buscar conta', 0
 
 start:
     xor ax, ax	; ax = 0
@@ -19,18 +20,88 @@ start:
 	int 0x10        ; call bios
 
 
-	call animacaoColorida
+	;call animacaoColorida
 
 	call menuAndIntegrantes
 
     .leitura:
         call lerLetra
         cmp al, 13
-        je limpaTela
+        je escolha
         jmp .leitura
 	ret
 
+escolha:
+    .cad:
+        call limpaTela
+        
+        mov si, titulo
+        mov bl,12
+        mov ah, 02h
+        mov dh, 5
+        mov dl, 14
+        int 10h
+        call printString
 
+        mov si, cadastro  
+        mov bl, 10
+        mov ah, 02h
+        mov dh, 9
+        mov dl, 13
+        int 10h
+        call printString
+
+        mov si, busca  
+        mov bl, 15
+        mov ah, 02h
+        mov dh, 12
+        mov dl, 13
+        int 10h
+        call printString
+
+        call lerLetra
+
+        cmp al, 's'
+        je .bus
+        ;cmp al, 13
+        ;je .done
+
+        jmp .cad
+    .bus:
+        call limpaTela
+        
+        mov si, titulo
+        mov bl,12
+        mov ah, 02h
+        mov dh, 5
+        mov dl, 14
+        int 10h
+        call printString
+
+        mov si, cadastro  
+        mov bl, 15
+        mov ah, 02h
+        mov dh, 9
+        mov dl, 13
+        int 10h
+        call printString
+
+        mov si, busca  
+        mov bl, 10
+        mov ah, 02h
+        mov dh, 12
+        mov dl, 13
+        int 10h
+        call printString
+
+        call lerLetra
+
+        cmp al, 'w'
+        je .cad
+        ;cmp al, 13
+        ;je .done
+
+        jmp .bus
 ;; Limpa a tela dos caracteres colocados pela BIOS
 limpaTela:
 	; Set the cursor to top left-most corner of screen
@@ -82,8 +153,6 @@ printString:
 
 exit:
     ret
-
-
 animacaoColorida:
 
 	;Colorindo a tela de preto.
@@ -146,8 +215,11 @@ animacaoColorida:
     ret
 
 
-delay: 
+
+
 ;; FunÃ§Ã£o que aplica um delay(improvisado) baseado no valor de dx
+delay: 
+
 	mov bp, dx
 	back:
 	dec bp
