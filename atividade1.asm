@@ -1,5 +1,6 @@
-org 0x7c00          ; set initial addres
-jmp start			; go to start session
+org 0x7e00          ; set initial addres
+jmp 0x0000:start			; go to start session
+
 bits 16
 titulo db 'Pratica 1',0
 humberto db 'hcct', 0
@@ -11,12 +12,13 @@ msg db 'PRESS ENTER', 0
 cadastro db 'Cadastrar conta', 0
 busca db 'Buscar conta', 0
 
+
 start:
     xor ax, ax	; ax = 0
     mov ds, ax	; ds = ax = 0
     mov es, ax  ; es = ax = 0
 
-	mov ax, 0x3     ; set video mode ah=0 al=3
+    mov ax, 0x3     ; set video mode ah=0 al=3
 	int 0x10        ; call bios
 
 
@@ -64,7 +66,7 @@ escolha:
         cmp al, 's'
         je .bus
         ;cmp al, 13
-        ;je .done
+        ;je cadastro
 
         jmp .cad
     .bus:
@@ -99,9 +101,13 @@ escolha:
         cmp al, 'w'
         je .cad
         ;cmp al, 13
-        ;je .done
+        ;je busca
 
         jmp .bus
+
+;cadastro:
+
+;busca:
 ;; Limpa a tela dos caracteres colocados pela BIOS
 limpaTela:
 	; Set the cursor to top left-most corner of screen
@@ -214,7 +220,7 @@ animacaoColorida:
     mov dx, 500
     ret
 
-
+av
 
 
 ;; FunÃ§Ã£o que aplica um delay(improvisado) baseado no valor de dx
@@ -419,6 +425,6 @@ moveCursor:	; printa titulo
 
 ; Final do código
 done:
-	times  510 - ($-$$) db 0
-	dw 0xAA55 ; boot sector magic number
+	times  63*512 - ($-$$) db 0
+	;dw 0xAA55 ; boot sector magic number
 
