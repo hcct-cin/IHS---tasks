@@ -5,13 +5,22 @@ bits 16
 titulo db 'Pratica 1',0
 humberto db 'hcct', 0
 gabriel db 'gme', 0
-gabriel2 db 'gfr', 0
+sonikku db 'gfr', 0
 malu db 'mlll', 0
 bernardo db 'rbnn', 0
 msg db 'PRESS ENTER', 0
 cadastro db 'Cadastrar conta', 0
 busca db 'Buscar conta', 0
+nom db 'Nome: ', 0
+pf db 'CPF: ', 0
+nu db 'Numero: ', 0
+nomAux db 0
 
+
+index db 0 ; Index do vetor
+nome db 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+cpf db 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+numero db 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 
 start:
     xor ax, ax	; ax = 0
@@ -31,7 +40,7 @@ start:
         cmp al, 13
         je escolha
         jmp .leitura
-	ret
+	    ret
 
 escolha:
     .cad:
@@ -65,8 +74,8 @@ escolha:
 
         cmp al, 's'
         je .bus
-        ;cmp al, 13
-        ;je cadastro
+        cmp al, 13
+        je cadastro1
 
         jmp .cad
     .bus:
@@ -100,14 +109,223 @@ escolha:
 
         cmp al, 'w'
         je .cad
-        ;cmp al, 13
-        ;je busca
+        cmp al, 13
+        je buscaNumero
 
         jmp .bus
 
-;cadastro:
+cadastro1:
+    .nome:
+        call limpaTela
+        mov dh, 9
+        mov dl, 10
+        mov si, nom
+        call moveCursor ; Move o cursor para o centro da tela
+        call printString ; Escreve "Nome: " na tela
 
-;busca:
+        xor cl, cl
+        mov di, nome
+        mov bh, byte[index]
+        call pegaAddress
+        .loopNome:
+            call lerLetra
+            
+            cmp al, 8  ; 8 = Backspace
+            je .backspace
+            cmp al, 13 ; 13 = Carriage Return (Enter)
+            je .done
+            cmp cl, 20 ; 20 é o limite de caracteres
+            je .loopNome
+            stosb
+            inc cl ; Caso o caractere não seja especial e possa ser printado, incrementamos a quantidade de caracteres atual.
+            
+            call printarLetra
+            jmp .loopNome
+        .backspace:
+            cmp cl, 0
+            je .loopNome
+            dec di
+            dec cl
+            mov byte[di], 0
+            call delchar
+            jmp .loopNome
+        .done:
+            mov al, 0
+            stosb
+            ;jmp escolha
+    .cpf:
+        call limpaTela
+        mov dh, 9
+        mov dl, 10
+        mov si, pf
+        call moveCursor ; Move o cursor para o centro da tela
+        call printString ; Escreve "Nome: " na tela
+
+        xor cl, cl
+        
+        mov di, cpf
+        mov bh, byte[index]
+        call pegaAddress
+
+        .loopCPF:
+            call lerLetra
+            
+            cmp al, 8  ; 8 = Backspace
+            je .backspaceCPF
+            cmp al, 13 ; 13 = Carriage Return (Enter)
+            je .doneCPF
+            cmp cl, 11 ; 11 é o tamanho do cpf
+            je .loopCPF
+            cmp al, '0'
+            jl .loopCPF
+            cmp al, '9'
+            jg .loopCPF
+            stosb
+            inc cl ; Caso o caractere não seja especial e possa ser printado, incrementamos a quantidade de caracteres atual.
+            
+            call printarLetra
+            jmp .loopCPF
+        .backspaceCPF:
+            cmp cl, 0
+            je .loopCPF
+            dec di
+            dec cl
+            mov byte[di], 0
+            call delchar
+            jmp .loopCPF
+        .doneCPF:
+            mov al, 0
+            stosb
+            
+    .numero:
+        call limpaTela
+        mov dh, 9
+        mov dl, 10
+        mov si, nu
+        call moveCursor ; Move o cursor para o centro da tela
+        call printString ; Escreve "Nome: " na tela
+
+        xor cl, cl
+
+        mov di, numero
+        mov bh, byte[index]
+        call pegaAddress
+        .loopNumero:
+            call lerLetra
+            
+            cmp al, 8  ; 8 = Backspace
+            je .backspaceNumero
+            cmp al, 13 ; 13 = Carriage Return (Enter)
+            je .doneNumero
+            cmp cl, 4 ; 4 é o tamanho do Numero
+            je .loopNumero
+            cmp al, '0'
+            jl .loopNumero
+            cmp al, '9'
+            jg .loopNumero
+            stosb
+            inc cl ; Caso o caractere não seja especial e possa ser printado, incrementamos a quantidade de caracteres atual.
+            
+            call printarLetra
+            jmp .loopNumero
+        .backspaceNumero:
+            cmp cl, 0
+            je .loopNumero
+            dec di
+            dec cl
+            mov byte[di], 0
+            call delchar
+            jmp .loopNumero
+        .doneNumero:
+            mov al, 0
+            stosb
+            jmp done1
+    done1:
+        add byte[index], 1
+        jmp escolha
+
+buscaNumero:
+    call limpaTela
+    mov si, nome
+    mov dh, 5
+    mov dl, 13
+    call moveCursor
+    call printString 
+    mov si, cpf
+    mov dh, 6
+    mov dl, 13
+    call moveCursor
+    call printString
+    mov si, numero
+    mov dh, 7
+    mov dl, 13
+    call moveCursor
+    call printString
+    
+    mov si, nome
+    add si, 20
+    mov dh, 9
+    mov dl, 13
+    call moveCursor
+    call printString 
+    mov si, cpf
+    add si, 20
+    mov dh, 10
+    mov dl, 13
+    call moveCursor
+    call printString
+    mov si, numero
+    add si, 20
+    mov dh, 11
+    mov dl, 13
+    call moveCursor
+    call printString
+
+    mov si, nome
+    add si, 40
+    mov dh, 12
+    mov dl, 13
+    call moveCursor
+    call printString 
+    mov si, cpf
+    add si, 40
+    mov dh, 13
+    mov dl, 13
+    call moveCursor
+    call printString
+    mov si, numero
+    add si, 40
+    mov dh, 14
+    mov dl, 13
+    call moveCursor
+    call printString
+    .escape:
+        call lerLetra
+        cmp al, 27 ; 27 = Escape
+        je escolha
+        
+        jmp .escape
+
+delchar:
+    mov al, 8 ; 8 = Backspace
+    call printarLetra
+    mov al,''
+    call printarLetra
+    mov al, 8
+    call printarLetra
+    ret
+  
+; mov bl, byte[index]
+pegaAddress:
+    cmp bh, 0
+    je .saiAddress
+    add di, 20
+    dec bh
+    jmp pegaAddress
+    .saiAddress:
+        ret
+
+
 ;; Limpa a tela dos caracteres colocados pela BIOS
 limpaTela:
 	; Set the cursor to top left-most corner of screen
@@ -116,7 +334,7 @@ limpaTela:
     mov ah, 0x2
     int 0x10
 
-    ; print 2000 blanck chars to clean  
+    ; print 2000 blank chars to clean  
     mov cx, 2000 
     mov bh, 0
     mov al, 0x20 ; blank char
@@ -129,7 +347,6 @@ limpaTela:
     mov ah, 0x2
     int 0x10
     ret
-
 
 ;; Lê uma letra e armazena em al
 lerLetra:
@@ -146,15 +363,11 @@ printarLetra:
 
 ;; Printa a string que esta em si    
 printString: 
-   
 	lodsb
 	cmp al, 0
 	je exit
-
 	mov ah, 0xe
 	int 10h	
-
-	
 	jmp printString
 
 exit:
@@ -220,12 +433,8 @@ animacaoColorida:
     mov dx, 500
     ret
 
-av
-
-
 ;; FunÃ§Ã£o que aplica um delay(improvisado) baseado no valor de dx
 delay: 
-
 	mov bp, dx
 	back:
 	dec bp
@@ -260,34 +469,34 @@ menuAndIntegrantes:
 	mov si, titulo
 	call printString
 
-    mov dh, 14  ; Linhas  
+    mov dh, 10  ; Linhas  
     mov dl, 10  ; Colunas
     call moveCursor
     mov si, malu
     call printString
     
-    mov dh, 15  ; Linhas  
+    mov dh, 11  ; Linhas  
     mov dl, 10  ; Colunas
     call moveCursor
     mov si, humberto
     call printString
 
-    mov dh, 16  ; Linhas  
+    mov dh, 12  ; Linhas  
     mov dl, 10  ; Colunas
     call moveCursor
     mov si, bernardo
     call printString
 
-    mov dh, 17  ; Linhas  
+    mov dh, 13  ; Linhas  
     mov dl, 10  ; Colunas
     call moveCursor
     mov si, gabriel
     call printString
 
-    mov dh, 18  ; Linhas  
+    mov dh, 14  ; Linhas  
     mov dl, 10  ; Colunas
     call moveCursor
-    mov si, gabriel2
+    mov si, sonikku
     call printString
 
     mov dh, 19  ; Linhas  
@@ -295,7 +504,6 @@ menuAndIntegrantes:
     call moveCursor
     mov si, msg
     call printString
-
     pop ax
     ret  
 
@@ -305,9 +513,7 @@ moveCursor:	; printa titulo
     int 0x10
     ret
 
-
- printaQuadrado:
-    
+printaQuadrado:
     ; Selecionando o modo de video
     mov ah, 0
     mov al, 13h
@@ -369,7 +575,6 @@ moveCursor:	; printa titulo
         
         jmp loop3
 
-
     loop4:
         pop ax    
         cmp ax, 140
@@ -387,9 +592,6 @@ moveCursor:	; printa titulo
         
         jmp loop4
 
-
-        
-
     trataAX:
         mov ax, 0
         push ax
@@ -405,23 +607,15 @@ moveCursor:	; printa titulo
         push ax
         jmp loop4
 
-
     endLoop:
         ret
 
-
-
     printaPixel:
-
-    mov ah, 0ch
-    mov bh, 0
-    mov al, 4
-    int 10h
-
-    ret
-
-
-
+        mov ah, 0ch
+        mov bh, 0
+        mov al, 4
+        int 10h
+        ret
 
 ; Final do código
 done:

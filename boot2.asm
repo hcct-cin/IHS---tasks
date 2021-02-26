@@ -28,3 +28,5 @@ load:
     jc load
     ;se o acesso falhar, tenta novamente
     jmp 0x7e00 ;pula para o setor de endereco 0x7c00 (start do atividade1.asm)
+times 510-($-$$) db 0 ;512 bytes
+dw 0xaa55

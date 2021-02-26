@@ -31,4 +31,4 @@ load:
 ;0x500 (start do boot2)
 times 510-($-$$) db 0 ;512 bytes
 dw 0xaa55
-;assinatura
+;assinaturae
