@@ -14,7 +14,9 @@ busca db 'Buscar conta', 0
 nom db 'Nome: ', 0
 pf db 'CPF: ', 0
 nu db 'Numero: ', 0
-nomAux db 0
+igual db 'IGUAL PORRA', 0
+
+search db 0
 
 
 index db 0 ; Index do vetor
@@ -110,7 +112,7 @@ escolha:
         cmp al, 'w'
         je .cad
         cmp al, 13
-        je buscaNumero
+        je buscaCPF
 
         jmp .bus
 
@@ -244,61 +246,65 @@ cadastro1:
         add byte[index], 1
         jmp escolha
 
-buscaNumero:
+buscaCPF:
     call limpaTela
-    mov si, nome
-    mov dh, 5
-    mov dl, 13
-    call moveCursor
-    call printString 
-    mov si, cpf
-    mov dh, 6
-    mov dl, 13
-    call moveCursor
-    call printString
-    mov si, numero
-    mov dh, 7
-    mov dl, 13
-    call moveCursor
-    call printString
-    
-    mov si, nome
-    add si, 20
-    mov dh, 9
-    mov dl, 13
-    call moveCursor
-    call printString 
-    mov si, cpf
-    add si, 20
+    mov si, pf
     mov dh, 10
-    mov dl, 13
-    call moveCursor
-    call printString
-    mov si, numero
-    add si, 20
-    mov dh, 11
-    mov dl, 13
+    mov dl, 12
     call moveCursor
     call printString
 
-    mov si, nome
-    add si, 40
-    mov dh, 12
-    mov dl, 13
-    call moveCursor
-    call printString 
-    mov si, cpf
-    add si, 40
-    mov dh, 13
-    mov dl, 13
-    call moveCursor
-    call printString
-    mov si, numero
-    add si, 40
-    mov dh, 14
-    mov dl, 13
-    call moveCursor
-    call printString
+    mov di, search
+    .loopCPF2:
+            call lerLetra
+            
+            cmp al, 8  ; 8 = Backspace
+            je .backspaceCPF2
+            cmp al, 13 ; 13 = Carriage Return (Enter)
+            je .doneCPF2
+            cmp cl, 11 ; 11 é o tamanho do cpf
+            je .loopCPF2
+            cmp al, '0'
+            jl .loopCPF2
+            cmp al, '9'
+            jg .loopCPF2
+            stosb
+            inc cl ; Caso o caractere não seja especial e possa ser printado, incrementamos a quantidade de caracteres atual.
+            
+            call printarLetra
+            jmp .loopCPF2
+        .backspaceCPF2:
+            cmp cl, 0
+            je .loopCPF2
+            dec di
+            dec cl
+            mov byte[di], 0
+            call delchar
+            jmp .loopCPF2
+        .doneCPF2:
+            mov al, 0
+            stosb
+            .compara:
+                mov di, search
+                mov si, cpf
+                lodsb
+                mov ah, byte[search]
+                inc di
+                cmp ah, 0
+                je .cabou
+                cmp al, 0
+                je .cabou
+                cmp ah, al
+                je .compara
+
+                call limpaTela
+            .cabou:
+                call limpaTela
+                mov si, igual
+                mov dh, 12
+                mov dl, 12
+                call moveCursor
+                call printString
     .escape:
         call lerLetra
         cmp al, 27 ; 27 = Escape
