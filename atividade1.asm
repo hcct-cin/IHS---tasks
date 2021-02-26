@@ -19,7 +19,8 @@ igual db 'CPF encontrado', 0
 search db 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 contadorCPF db 0
 notFound db '404 NOT FOUND', 0
-faltaCadastro db 'CPF não cadastrado', 0
+faltaCadastro db 'CPF nao cadastrado', 0
+emptyDB db 'nenhum user cadastrado', 0
 
 index db 0 ; Index do vetor
 nome db 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
@@ -140,6 +141,8 @@ cadastro1:
             je .done
             cmp cl, 20 ; 20 é o limite de caracteres
             je .loopNome
+            cmp al, 27
+            je escolha
             stosb
             inc cl ; Caso o caractere não seja especial e possa ser printado, incrementamos a quantidade de caracteres atual.
             
@@ -272,6 +275,8 @@ buscaCPF:
             je .backspaceCPF2
             cmp al, 13 ; 13 = Carriage Return (Enter)
             je .doneCPF2
+            cmp al, 27
+            je escolha
             cmp cl, 11 ; 11 é o tamanho do cpf
             je .loopCPF2
             cmp al, '0'
@@ -294,6 +299,9 @@ buscaCPF:
         .doneCPF2:
             cmp cl, 0
             je .loopCPF2
+            mov al, byte[index]
+            cmp al, 0
+            je .bdvazio
             mov al, 0
             stosb
             mov di, cpf
@@ -311,6 +319,15 @@ buscaCPF:
                 je .compara
 
                 jmp .nextCPF
+            .bdvazio:
+                call limpaTela
+                mov si, emptyDB
+                mov bl, 15
+                mov dh, 8
+                mov dl, 6
+                call moveCursor
+                call printString
+                jmp .escape
 
             .notfound:
                 call limpaTela
@@ -324,7 +341,7 @@ buscaCPF:
 
                 mov si, faltaCadastro
                 mov bl, 10
-                mov dh, 7
+                mov dh, 6
                 mov dl, 6
                 call moveCursor
                 call printString
