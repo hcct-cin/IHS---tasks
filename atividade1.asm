@@ -14,9 +14,9 @@ busca db 'Buscar conta', 0
 nom db 'Nome: ', 0
 pf db 'CPF: ', 0
 nu db 'Numero: ', 0
-igual db 'IGUAL PORRA', 0
+igual db 'CPF encontrado', 0
 
-search db 0
+search db 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 contadorCPF db 0
 
 index db 0 ; Index do vetor
@@ -302,21 +302,45 @@ buscaCPF:
                 jmp .nextCPF
             .endString:
                 call limpaTela
-                mov si, igual
+                
+                mov bh, byte[contadorCPF]
+                mov di, nome
+                call pegaAddress
+                mov si, di
                 mov dh, 12
                 mov dl, 12
                 call moveCursor
                 call printString
+                
+                mov bh, byte[contadorCPF]
+                mov di, cpf
+                call pegaAddress
+                mov si, di
+                mov dh, 13
+                mov dl, 12
+                call moveCursor
+                call printString
+
+                mov bh, byte[contadorCPF]
+                mov di, numero
+                call pegaAddress
+                mov si, di
+                mov dh, 14
+                mov dl, 12
+                call moveCursor
+                call printString
+
                 jmp .escape
             .nextCPF:
-                mov bh, byte[contadorCPF]
                 add byte[contadorCPF], 1
+                mov bh, byte[contadorCPF]
                 mov di, cpf
                 mov si, search
                 call pegaAddress
                 jmp .compara
 
     .escape:
+        mov byte[contadorCPF], 0
         call lerLetra
         cmp al, 27 ; 27 = Escape
         je escolha
