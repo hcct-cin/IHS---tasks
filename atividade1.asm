@@ -18,6 +18,8 @@ igual db 'CPF encontrado', 0
 
 search db 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 contadorCPF db 0
+notFound db '404 NOT FOUND', 0
+faltaCadastro db 'CPF não cadastrado', 0
 
 index db 0 ; Index do vetor
 nome db 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
@@ -152,6 +154,8 @@ cadastro1:
             call delchar
             jmp .loopNome
         .done:
+            cmp cl, 0
+            je .loopNome
             mov al, 0
             stosb
             ;jmp escolha
@@ -196,6 +200,8 @@ cadastro1:
             call delchar
             jmp .loopCPF
         .doneCPF:
+            cmp cl, 0
+            je .loopCPF
             mov al, 0
             stosb
             
@@ -239,6 +245,8 @@ cadastro1:
             call delchar
             jmp .loopNumero
         .doneNumero:
+            cmp cl, 0
+            je .loopNumero
             mov al, 0
             stosb
             jmp done1
@@ -284,6 +292,8 @@ buscaCPF:
             call delchar
             jmp .loopCPF2
         .doneCPF2:
+            cmp cl, 0
+            je .loopCPF2
             mov al, 0
             stosb
             mov di, cpf
@@ -299,13 +309,35 @@ buscaCPF:
                 je .endString
                 cmp ah, al
                 je .compara
+
                 jmp .nextCPF
+
+            .notfound:
+                call limpaTela
+                
+                mov si, notFound
+                mov bl, 10
+                mov dh, 5
+                mov dl, 6
+                call moveCursor
+                call printString
+
+                mov si, faltaCadastro
+                mov bl, 10
+                mov dh, 7
+                mov dl, 6
+                call moveCursor
+                call printString
+
+                jmp .escape
+                
             .endString:
                 call limpaTela
                 
                 mov bh, byte[contadorCPF]
                 mov di, nome
                 call pegaAddress
+                mov bl, 10
                 mov si, di
                 mov dh, 12
                 mov dl, 12
@@ -315,6 +347,7 @@ buscaCPF:
                 mov bh, byte[contadorCPF]
                 mov di, cpf
                 call pegaAddress
+                mov bl, 10
                 mov si, di
                 mov dh, 13
                 mov dl, 12
@@ -324,6 +357,7 @@ buscaCPF:
                 mov bh, byte[contadorCPF]
                 mov di, numero
                 call pegaAddress
+                mov bl, 10
                 mov si, di
                 mov dh, 14
                 mov dl, 12
@@ -333,6 +367,12 @@ buscaCPF:
                 jmp .escape
             .nextCPF:
                 add byte[contadorCPF], 1
+                
+                mov bl, byte[contadorCPF]
+                mov bh, byte[index]
+                cmp bh, bl
+                je .notfound
+
                 mov bh, byte[contadorCPF]
                 mov di, cpf
                 mov si, search
@@ -365,8 +405,7 @@ pegaAddress:
     jmp pegaAddress
     .saiAddress:
         ret
-
-
+        
 ;; Limpa a tela dos caracteres colocados pela BIOS
 limpaTela:
 	; Set the cursor to top left-most corner of screen
