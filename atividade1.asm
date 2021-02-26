@@ -17,7 +17,7 @@ nu db 'Numero: ', 0
 igual db 'IGUAL PORRA', 0
 
 search db 0
-
+contadorCPF db 0
 
 index db 0 ; Index do vetor
 nome db 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
@@ -249,11 +249,13 @@ cadastro1:
 buscaCPF:
     call limpaTela
     mov si, pf
+    mov bl, 15
     mov dh, 10
     mov dl, 12
     call moveCursor
     call printString
 
+    xor cl, cl
     mov di, search
     .loopCPF2:
             call lerLetra
@@ -284,27 +286,36 @@ buscaCPF:
         .doneCPF2:
             mov al, 0
             stosb
+            mov di, cpf
+            mov si, search
             .compara:
-                mov di, search
-                mov si, cpf
-                lodsb
-                mov ah, byte[search]
+                mov al, byte[di]
+                mov ah, byte[si]
                 inc di
+                inc si
                 cmp ah, 0
-                je .cabou
+                je .endString
                 cmp al, 0
-                je .cabou
+                je .endString
                 cmp ah, al
                 je .compara
-
-                call limpaTela
-            .cabou:
+                jmp .nextCPF
+            .endString:
                 call limpaTela
                 mov si, igual
                 mov dh, 12
                 mov dl, 12
                 call moveCursor
                 call printString
+                jmp .escape
+            .nextCPF:
+                mov bh, byte[contadorCPF]
+                add byte[contadorCPF], 1
+                mov di, cpf
+                mov si, search
+                call pegaAddress
+                jmp .compara
+
     .escape:
         call lerLetra
         cmp al, 27 ; 27 = Escape
@@ -321,7 +332,7 @@ delchar:
     call printarLetra
     ret
   
-; mov bl, byte[index]
+; mov bh, byte[index]
 pegaAddress:
     cmp bh, 0
     je .saiAddress
