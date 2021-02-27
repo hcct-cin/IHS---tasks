@@ -205,6 +205,8 @@ cadastro1:
         .doneCPF:
             cmp cl, 0
             je .loopCPF
+            cmp cl, 11
+            jne .loopCPF
             mov al, 0
             stosb
             
@@ -250,6 +252,9 @@ cadastro1:
         .doneNumero:
             cmp cl, 0
             je .loopNumero
+            cmp cl, 4
+            jne .loopNumero
+
             mov al, 0
             stosb
             jmp done1
@@ -259,6 +264,9 @@ cadastro1:
 
 buscaCPF:
     call limpaTela
+    mov al, byte[index]
+    cmp al, 0
+    je .bdvazio
     mov si, pf
     mov bl, 15
     mov dh, 10
@@ -299,9 +307,8 @@ buscaCPF:
         .doneCPF2:
             cmp cl, 0
             je .loopCPF2
-            mov al, byte[index]
-            cmp al, 0
-            je .bdvazio
+            cmp cl, 11
+            jne .loopCPF2
             mov al, 0
             stosb
             mov di, cpf
