@@ -36,7 +36,7 @@ start:
 	int 0x10        ; call bios
 
 
-	;call animacaoColorida
+	call animacaoColorida
 
 	call menuAndIntegrantes
 
@@ -52,7 +52,7 @@ escolha:
         call limpaTela
         
         mov si, titulo
-        mov bl,12
+        mov bl, 12
         mov ah, 02h
         mov dh, 5
         mov dl, 14
@@ -60,7 +60,7 @@ escolha:
         call printString
 
         mov si, cadastro  
-        mov bl, 10
+        mov bl, 4
         mov ah, 02h
         mov dh, 9
         mov dl, 13
@@ -87,7 +87,7 @@ escolha:
         call limpaTela
         
         mov si, titulo
-        mov bl,12
+        mov bl, 12
         mov ah, 02h
         mov dh, 5
         mov dl, 14
@@ -103,7 +103,7 @@ escolha:
         call printString
 
         mov si, busca  
-        mov bl, 10
+        mov bl, 4
         mov ah, 02h
         mov dh, 12
         mov dl, 13
@@ -323,7 +323,7 @@ buscaCPF:
                 call limpaTela
                 mov si, emptyDB
                 mov bl, 15
-                mov dh, 8
+                mov dh, 10
                 mov dl, 6
                 call moveCursor
                 call printString
@@ -354,9 +354,9 @@ buscaCPF:
                 mov bh, byte[contadorCPF]
                 mov di, nome
                 call pegaAddress
-                mov bl, 10
+                mov bl, 15
                 mov si, di
-                mov dh, 12
+                mov dh, 10
                 mov dl, 12
                 call moveCursor
                 call printString
@@ -364,9 +364,9 @@ buscaCPF:
                 mov bh, byte[contadorCPF]
                 mov di, cpf
                 call pegaAddress
-                mov bl, 10
+                mov bl, 15
                 mov si, di
-                mov dh, 13
+                mov dh, 11
                 mov dl, 12
                 call moveCursor
                 call printString
@@ -374,9 +374,9 @@ buscaCPF:
                 mov bh, byte[contadorCPF]
                 mov di, numero
                 call pegaAddress
-                mov bl, 10
+                mov bl, 15
                 mov si, di
-                mov dh, 14
+                mov dh, 12
                 mov dl, 12
                 call moveCursor
                 call printString
@@ -483,7 +483,7 @@ animacaoColorida:
 	mov dl, 24h
 	int 10h
     mov dx, 500
-	;call delay
+	call delay
 
 	;Colorindo a tela de vermelho.
 	mov ah, 0xb  
@@ -498,7 +498,7 @@ animacaoColorida:
 	int 10h
 
     mov dx, 500
-    ;call delay
+    call delay
 	;Colorindo a tela de preto.
 	mov ah, 0xb  
 	mov bh, 0     
@@ -513,7 +513,7 @@ animacaoColorida:
         inc dx
         inc cx
     mov dx, 500
-	;call delay
+	call delay
 
 	;Colorindo a tela de vermelho (fim).
 	mov ah, 0xb  
@@ -631,7 +631,7 @@ printaQuadrado:
         push dx
         push cx
         mov dx, 6
-        ;call delay
+        call delay
         pop cx
         pop dx
         call printaPixel
@@ -648,7 +648,7 @@ printaQuadrado:
          push dx
         push cx
         mov dx, 6
-        ;call delay
+        call delay
         pop cx
         pop dx
         call printaPixel
@@ -665,7 +665,7 @@ printaQuadrado:
          push dx
         push cx
         mov dx, 6
-        ;call delay
+        call delay
         pop cx
         pop dx
         call printaPixel
@@ -682,7 +682,7 @@ printaQuadrado:
          push dx
         push cx
         mov dx, 6
-        ;call delay
+        call delay
         pop cx
         pop dx
         call printaPixel
