@@ -47,10 +47,10 @@ rotinaDaAP2:
     call lengthString                   ; chamo a função que coloca em cx o tamanho da string titulo
    
     
-    pop bx                              ; desempilho o bx
-    pop cx                              ; desempilho o cx
-    pop ax                              ; desempilho o ax
     pop si                              ; desempilho o si
+    pop ax                              ; desempilho o ax
+    pop cx                              ; desempilho o cx
+    pop bx                              ; desempilho o bx
 
     iret
   

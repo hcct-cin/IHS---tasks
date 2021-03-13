@@ -15,6 +15,7 @@ nom db 'Nome: ', 0
 pf db 'CPF: ', 0
 nu db 'Numero: ', 0
 igual db 'CPF encontrado', 0
+fim db 'FIM', 0
 
 search db 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 contadorCPF db 0
@@ -27,6 +28,8 @@ nome db 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
 cpf db 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 numero db 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 
+entrada db '', 0
+
 start:
     xor ax, ax	; ax = 0
     mov ds, ax	; ds = ax = 0
@@ -35,10 +38,51 @@ start:
     mov ax, 0x3     ; set video mode ah=0 al=3
 	int 0x10        ; call bios
 
+    
+
+    CLI                                 ; sets interrupt flag to 0
+    mov word es:[88H], rotinaDaAP2      ; Coloco no endereço que vamos invocar no indice 22h
+    mov es:[8AH], cs                    ; 
+    sti                                 ; sets interrupt flag to 1
+    
+    
+    mov di, entrada                        ; leio do teclado e converto para um interio. O valor que eu ler vai ser convertido para INT e colocado em ax, se for 1 ele faz a função busca conta, se for 0 ele faz a função casdastro
+    call gets
+    mov si, entrada
+    call stoi
+
+
+
+    int 22h                             ; chamo a interrupção que faz o que a questão pede
+  
+  
+
+
+    jmp done
+
+
+
+rotinaDaAP2:
+    push bx                             ; empilho o bx
+    push cx                             ; empilho o cx
+    push si                             ; empilho o si
+
+    push ax                             ; Coloco ax na pilha
+    call atividade1                     ; chamo a função da atividade 1
+
+
+    pop si                              ; desempilho o si
+    pop cx                              ; desempilho o cx
+    pop bx                              ; desempilho o bx
+
+    iret
+  
+
+
+atividade1:
 
 	call animacaoColorida
-
-	call menuAndIntegrantes
+    call menuAndIntegrantes
 
     .leitura:
         call lerLetra
@@ -52,72 +96,61 @@ escolha:
         call limpaTela
         
         mov si, titulo
-        mov bl, 12
+        mov bl, 4
         mov ah, 02h
         mov dh, 5
         mov dl, 14
         int 10h
         call printString
 
-        mov si, cadastro  
-        mov bl, 4
-        mov ah, 02h
-        mov dh, 9
-        mov dl, 13
-        int 10h
-        call printString
+        pop ax                      ; desempilho ax
 
-        mov si, busca  
-        mov bl, 15
-        mov ah, 02h
-        mov dh, 12
-        mov dl, 13
-        int 10h
-        call printString
+        cmp ax, 0                   ; comparo ax com 0, se for vou para a função de cadastro
+        je printaCadastro
 
-        call lerLetra
-
-        cmp al, 's'
-        je .bus
-        cmp al, 13
-        je cadastro1
+        cmp ax, 1                   ; comparo ax com 1, se for vou para a função de busca
+        je printaBusca
 
         jmp .cad
-    .bus:
-        call limpaTela
-        
-        mov si, titulo
-        mov bl, 12
-        mov ah, 02h
-        mov dh, 5
-        mov dl, 14
-        int 10h
-        call printString
 
-        mov si, cadastro  
-        mov bl, 15
+printaBusca:
+        mov si, busca  
+        mov bl, 14
         mov ah, 02h
         mov dh, 9
         mov dl, 13
         int 10h
         call printString
 
-        mov si, busca  
-        mov bl, 4
-        mov ah, 02h
-        mov dh, 12
-        mov dl, 13
-        int 10h
-        call printString
-
         call lerLetra
 
-        cmp al, 'w'
-        je .cad
+
         cmp al, 13
         je buscaCPF
 
-        jmp .bus
+
+
+        jmp printaBusca
+
+
+printaCadastro:
+        mov si, cadastro  
+        mov bl, 14
+        mov ah, 02h
+        mov dh, 9
+        mov dl, 13
+        int 10h
+        call printString
+ 
+        call lerLetra
+        cmp al, 13
+        je cadastro1
+
+        jmp printaCadastro
+
+
+
+
 
 cadastro1:
     .nome:
@@ -476,6 +509,26 @@ printString:
 
 exit:
     ret
+
+
+stoi:                ; mov si, string
+  xor cx, cx
+  xor ax, ax
+  .loop1:
+    push ax
+    lodsb
+    mov cl, al
+    pop ax
+    cmp cl, 0        ; check EOF(NULL)
+    je .endloop1
+    sub cl, 48       ; '9'-'0' = 9
+    mov bx, 10
+    mul bx           ; 999*10 = 9990
+    add ax, cx       ; 9990+9 = 9999
+    jmp .loop1
+  .endloop1:
+  ret
+
 animacaoColorida:
 
 	;Colorindo a tela de preto.
@@ -548,7 +601,53 @@ delay:
 	cmp dx,0    
 	jnz back
     ret
+gets:                 ; mov di, string
+  xor cx, cx          ; zerar contador
+  .loop1:
+    call getchar
+    cmp al, 0x08      ; backspace
+    je .backspace
+    cmp al, 0x0d      ; carriage return
+    je .done
+    cmp cl, 10        ; string limit checker
+    je .loop1
+    
+    stosb
+    inc cl
+    call putchar
+    
+    jmp .loop1
+    .backspace:
+      cmp cl, 0       ; is empty?
+      je .loop1
+      dec di
+      dec cl
+      mov byte[di], 0
+      call delchar
+    jmp .loop1
+  .done:
+  mov al, 0
+  stosb
+  call endl
+  ret
 
+putchar:
+  mov ah, 0x0e
+  int 10h
+  ret
+  
+getchar:
+  mov ah, 0x00
+  int 16h
+  ret
+  
+
+endl:
+  mov al, 0x0a          ; line feed
+  call putchar
+  mov al, 0x0d          ; carriage return
+  call putchar
+  ret
 menuAndIntegrantes:
     
     xor ax, ax
@@ -725,3 +824,4 @@ printaQuadrado:
 done:
 	times  63*512 - ($-$$) db 0
 	;dw 0xAA55 ; boot sector magic number
+
