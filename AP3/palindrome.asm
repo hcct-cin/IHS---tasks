@@ -10,11 +10,8 @@ palindrome:
     add eax, ecx                        ;put in SI the end of the string (index[tamanho-1])
  
 check:
-        ;cmp byte[edx], 'a'
-        ;je .a
-        ;jmp done
-         mov dl, byte[edx]                   ;put the caracter in al (ou pelo menos tentando kkk)             
-         mov al, byte[eax]                   ;put the caracter in cl (ou pelo menos tentando kkk)
+        mov dl, byte[edx]                   ;put the caracter in al (ou pelo menos tentando kkk)             
+        mov al, byte[eax]                   ;put the caracter in cl (ou pelo menos tentando kkk)
 
         cmp dl, al                      ;compare first and last caracter  
         jne notpalindrome               ; if the first and the last caracter isn't the same got to "notpalindrome"
@@ -23,15 +20,11 @@ check:
         loop check                      ; go to check again
 
         mov eax, 1                      ;is palindrome
-
         jmp done                        ; end
-        .a:
-        mov eax, 999
-        jmp done
 
 notpalindrome:
         mov eax, 0                      ; isn't palindrome
         jmp done                        ; end
 done:
-leave
+        leave
         ret                             ; end
