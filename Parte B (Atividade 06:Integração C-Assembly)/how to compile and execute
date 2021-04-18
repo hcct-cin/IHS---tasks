@@ -1,0 +1,6 @@
+How to compile and execute
+
+nasm -f elf sort.asm
+gcc -Wall -m32 main.c sort.o
+./a.out
+
